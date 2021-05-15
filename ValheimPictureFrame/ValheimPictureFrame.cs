@@ -14,7 +14,7 @@ namespace ValheimPictureFrame
     [BepInDependency(Main.ModGuid)]
     public class ValheimPictureFrame : BaseUnityPlugin
     {
-        public static readonly TextureCache spriteCache = new TextureCache("ValheimPictureFrame/Assets/Images");
+        public static readonly TextureCache textureCache = new TextureCache("ValheimPictureFrame/Assets/Images");
         public static readonly string TOKEN_NAME = "$piece_dfirst_pictureframe";
         public static readonly string TOKEN_NAME_VERTICAL = "$piece_dfirst_pictureframe_vertical";
         public static readonly string TOKEN_NAME_SQUARE = "$piece_dfirst_pictureframe_square";

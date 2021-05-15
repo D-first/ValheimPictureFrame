@@ -69,8 +69,6 @@ namespace ValheimPictureFrame.Patches
             var text = ___m_textWidget.text.Split(':');
             GameObject pictureFrame = __instance.gameObject;
             Transform pivotObject = pictureFrame.transform.Find("Pivot");
-            //Vector3 currentRotation = pictureFrame.transform.rotation.eulerAngles;
-            //pictureFrame.transform.rotation = Quaternion.Euler(0, currentRotation.y, currentRotation.z);
             pictureFrame.transform.localScale = Vector3.one;
             pivotObject.transform.localPosition = Vector3.zero;
 
@@ -118,44 +116,11 @@ namespace ValheimPictureFrame.Patches
                     pictureFrame.transform.localScale = Vector3.one * scale;
                     pivotObject.transform.localPosition -= pivotOffset / scale;
                 }
-
-                //if (options.ContainsKey("tilt") || options.ContainsKey("t"))
-                //{
-                //    string key = options.ContainsKey("tilt") ? "tilt" : "t";
-                //    float tilt = float.Parse(options[key]);
-                //    pivotObject.transform.position += new Vector3(0, framePivots[___m_name].y, 0);
-                //    pictureFrame.transform.rotation = Quaternion.Euler(tilt, currentRotation.y, currentRotation.z);
-                //    pivotObject.transform.position -= new Vector3(0, framePivots[___m_name].y, 0);
-                //}
-
-                //if (options.ContainsKey("orientation") || options.ContainsKey("o"))
-                //{
-                //    string key = options.ContainsKey("orientation") ? "orientation" : "o";
-                //    string orientation = options[key];
-                //    int rotate = 0;
-
-                //    switch (orientation)
-                //    {
-                //        case "vertical":
-                //        case "v":
-                //            rotate = 90;
-                //            break;
-                //        case "horizontal":
-                //        case "h":
-                //            rotate = 0;
-                //            break;
-                //        default:
-                //            break;
-                //    }
-
-                //    pictureFrame.transform.rotation = Quaternion.Euler(currentRotation.x, currentRotation.y, rotate);
-                //}
-
             }
 
             Renderer pictureRenderer = __instance.transform.Find("Pivot/New/Picture").gameObject.GetComponent<Renderer>();
             var textureName = text[0].Trim();
-            pictureRenderer.material.mainTexture = ValheimPictureFrame.spriteCache.Load(textureName);
+            pictureRenderer.material.mainTexture = ValheimPictureFrame.textureCache.Load(textureName);
         }
 
         private static Dictionary<string, string> ParseOptions(string[] args)
