@@ -4,7 +4,6 @@ using Jotunn;
 using Jotunn.Configs;
 using Jotunn.Entities;
 using Jotunn.Managers;
-using System;
 using UnityEngine;
 using ValheimPictureFrame.Utils;
 
@@ -30,7 +29,7 @@ namespace ValheimPictureFrame
         private void AddPiece()
         {
             var assetBundle = AssetBundleHelper.GetAssetBundleFromResources("pictureframe");
-            string[] prefabNames = new string[] { "PictureFrame", "PictureFrameVertical", "PictureFrameSquare"};
+            string[] prefabNames = new string[] { "PictureFrame", "PictureFrameVertical", "PictureFrameSquare" };
             PieceConfig config = new PieceConfig()
             {
                 PieceTable = "Hammer",
@@ -51,14 +50,15 @@ namespace ValheimPictureFrame
                     }
                 }
             };
-            
+
             foreach (var prefabName in prefabNames)
             {
                 var prefab = assetBundle.LoadAsset<GameObject>($"Assets/Pieces/PictureFrame/{prefabName}.prefab");
-                var piece = new CustomPiece(prefab, config);
-                piece.FixReference = true;
+                var piece = new CustomPiece(prefab, config)
+                {
+                    FixReference = true
+                };
                 PieceManager.Instance.AddPiece(piece);
-
             }
 
             assetBundle.Unload(false);

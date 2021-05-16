@@ -88,7 +88,10 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Assets\Translations\English\english.json" />
+    <None Include="Assets\Translations\German\german.json" />
     <None Include="Assets\Translations\Japanese\japanese.json" />
+    <None Include="Assets\Translations\Polish\polish.json" />
+    <None Include="Assets\Translations\Russian\russian.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

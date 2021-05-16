@@ -45,11 +45,14 @@ namespace ValheimPictureFrame.Patches
 
         private static void UpdatePicture(Sign __instance, string ___m_name, Text ___m_textWidget, string beforeText)
         {
-            var names = new string[]
+            var pictureFrames = new Dictionary<string, Vector3>()
             {
-                ValheimPictureFrame.TOKEN_NAME, ValheimPictureFrame.TOKEN_NAME_VERTICAL, ValheimPictureFrame.TOKEN_NAME_SQUARE
+                { ValheimPictureFrame.TOKEN_NAME, new Vector3(0.729f, 0.4473f, 0) },
+                { ValheimPictureFrame.TOKEN_NAME_VERTICAL, new Vector3(0.4473f, 0.729f, 0) },
+                { ValheimPictureFrame.TOKEN_NAME_SQUARE, new Vector3(0.4473f, 0.4473f, 0) },
             };
-            if ( !names.Any(x => x == ___m_name))
+
+            if ( !pictureFrames.Keys.Any(x => x == ___m_name))
             {
                 return;
             }
@@ -58,13 +61,6 @@ namespace ValheimPictureFrame.Patches
             {
                 return;
             }
-
-            var framePivots = new Dictionary<string, Vector3>()
-            {
-                { names[0], new Vector3(0.729f, 0.4473f, 0) },
-                { names[1], new Vector3(0.4473f, 0.729f, 0) },
-                { names[2], new Vector3(0.4473f, 0.4473f, 0) },
-            };
 
             var text = ___m_textWidget.text.Split(':');
             GameObject pictureFrame = __instance.gameObject;
@@ -88,19 +84,19 @@ namespace ValheimPictureFrame.Patches
                         {
                             case "t":
                             case "top":
-                                pivotOffset += new Vector3(0, -framePivots[___m_name].y, 0);
+                                pivotOffset += new Vector3(0, -pictureFrames[___m_name].y, 0);
                                 break;
                             case "b":
                             case "bottom":
-                                pivotOffset += new Vector3(0, framePivots[___m_name].y, 0);
+                                pivotOffset += new Vector3(0, pictureFrames[___m_name].y, 0);
                                 break;
                             case "r":
                             case "right":
-                                pivotOffset += new Vector3(framePivots[___m_name].x, 0, 0);
+                                pivotOffset += new Vector3(pictureFrames[___m_name].x, 0, 0);
                                 break;
                             case "l":
                             case "left":
-                                pivotOffset += new Vector3(-framePivots[___m_name].x, 0, 0);
+                                pivotOffset += new Vector3(-pictureFrames[___m_name].x, 0, 0);
                                 break;
 
                         }
@@ -111,7 +107,7 @@ namespace ValheimPictureFrame.Patches
                 if (options.ContainsKey("scale") || options.ContainsKey("s"))
                 {
                     string key = options.ContainsKey("scale") ? "scale" : "s";
-                    float scale = Math.Min(float.Parse(options[key]), 10.0f);
+                    float scale = Math.Max(Math.Min(float.Parse(options[key]), 10.0f), 0.1f);
                     pivotObject.transform.localPosition = pivotOffset;
                     pictureFrame.transform.localScale = Vector3.one * scale;
                     pivotObject.transform.localPosition -= pivotOffset / scale;
