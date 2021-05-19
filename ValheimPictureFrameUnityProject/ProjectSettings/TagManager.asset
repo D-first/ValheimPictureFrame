@@ -3,13 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - snappoint
-  - StationUseArea
-  - roof
-  - spawned
-  - leaky
-  - minerock
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -39,7 +33,7 @@ TagManager:
   - viewblock
   - character_net
   - character_noenv
-  - vehicle
+  - vehcle
   - 
   - 
   - smoke
