@@ -14,10 +14,12 @@ namespace ValheimPictureFrame.Patches
         {
             static void Prefix(string ___m_name, Text ___m_textWidget, ref string __state)
             {
-                if (___m_name == ValheimPictureFrame.TOKEN_NAME)
+                if (!ValheimPictureFrame.pictureFrames.Keys.Any(x => x == ___m_name))
                 {
-                    __state = ___m_textWidget.text;
+                    return;
                 }
+
+                __state = ___m_textWidget.text;
             }
 
             static void Postfix(Sign __instance, string ___m_name, Text ___m_textWidget, string __state)
@@ -31,10 +33,12 @@ namespace ValheimPictureFrame.Patches
         {
             static void Prefix(string ___m_name, Text ___m_textWidget, ref string __state)
             {
-                if (___m_name == ValheimPictureFrame.TOKEN_NAME)
+                if (!ValheimPictureFrame.pictureFrames.Keys.Any(x => x == ___m_name))
                 {
-                    __state = ___m_textWidget.text;
+                    return;
                 }
+
+                __state = ___m_textWidget.text;
             }
 
             static void Postfix(Sign __instance, string ___m_name, Text ___m_textWidget, string __state)
@@ -45,14 +49,7 @@ namespace ValheimPictureFrame.Patches
 
         private static void UpdatePicture(Sign __instance, string ___m_name, Text ___m_textWidget, string beforeText)
         {
-            var pictureFrames = new Dictionary<string, Vector3>()
-            {
-                { ValheimPictureFrame.TOKEN_NAME, new Vector3(0.729f, 0.4473f, 0) },
-                { ValheimPictureFrame.TOKEN_NAME_VERTICAL, new Vector3(0.4473f, 0.729f, 0) },
-                { ValheimPictureFrame.TOKEN_NAME_SQUARE, new Vector3(0.4473f, 0.4473f, 0) },
-            };
-
-            if ( !pictureFrames.Keys.Any(x => x == ___m_name))
+            if (!ValheimPictureFrame.pictureFrames.Keys.Any(x => x == ___m_name))
             {
                 return;
             }
@@ -67,6 +64,10 @@ namespace ValheimPictureFrame.Patches
             Transform pivotObject = pictureFrame.transform.Find("Pivot");
             pictureFrame.transform.localScale = Vector3.one;
             pivotObject.transform.localPosition = Vector3.zero;
+
+            var filePath = text[0].Trim();
+            PictureFrame pictureFrameComponent = __instance.transform.gameObject.GetComponent<PictureFrame>();
+            pictureFrameComponent.StopAnimation();
 
             if (text.Length == 2)
             {
@@ -84,19 +85,20 @@ namespace ValheimPictureFrame.Patches
                         {
                             case "t":
                             case "top":
-                                pivotOffset += new Vector3(0, -pictureFrames[___m_name].y, 0);
+
+                                pivotOffset += new Vector3(0, -ValheimPictureFrame.pictureFrames[___m_name].y, 0);
                                 break;
                             case "b":
                             case "bottom":
-                                pivotOffset += new Vector3(0, pictureFrames[___m_name].y, 0);
+                                pivotOffset += new Vector3(0, ValheimPictureFrame.pictureFrames[___m_name].y, 0);
                                 break;
                             case "r":
                             case "right":
-                                pivotOffset += new Vector3(pictureFrames[___m_name].x, 0, 0);
+                                pivotOffset += new Vector3(ValheimPictureFrame.pictureFrames[___m_name].x, 0, 0);
                                 break;
                             case "l":
                             case "left":
-                                pivotOffset += new Vector3(-pictureFrames[___m_name].x, 0, 0);
+                                pivotOffset += new Vector3(-ValheimPictureFrame.pictureFrames[___m_name].x, 0, 0);
                                 break;
 
                         }
@@ -112,11 +114,25 @@ namespace ValheimPictureFrame.Patches
                     pictureFrame.transform.localScale = Vector3.one * scale;
                     pivotObject.transform.localPosition -= pivotOffset / scale;
                 }
+
+                if (options.ContainsKey("interval") || options.ContainsKey("i"))
+                {
+                    string key = options.ContainsKey("interval") ? "interval" : "i";
+                    float interval = Math.Max(float.Parse(options[key]), 0.01f);
+                    pictureFrameComponent.Interval = interval;
+                }
             }
 
-            Renderer pictureRenderer = __instance.transform.Find("Pivot/New/Picture").gameObject.GetComponent<Renderer>();
-            var textureName = text[0].Trim();
-            pictureRenderer.material.mainTexture = ValheimPictureFrame.textureCache.Load(textureName);
+
+            if (ValheimPictureFrame.textureCache.IsDirectory(filePath))
+            {
+                pictureFrameComponent.StartAnimation(ValheimPictureFrame.textureCache.LoadTextureNames(filePath));
+            }
+            else
+            {
+                pictureFrameComponent.SetTexture(filePath);
+            }
+
         }
 
         private static Dictionary<string, string> ParseOptions(string[] args)
