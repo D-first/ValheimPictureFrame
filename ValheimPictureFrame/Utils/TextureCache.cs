@@ -1,5 +1,4 @@
-﻿using Jotunn.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,8 +36,17 @@ namespace ValheimPictureFrame.Utils
             {
                 return null;
             }
+            
+            string path = Path.Combine(ImageBasePath, textureName);
 
-            var texture = AssetUtils.LoadTexture(Path.Combine(ImageBasePath, textureName));
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
+            byte[] fileData = File.ReadAllBytes(path);
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(fileData);
 
             if (texture == null)
             {
@@ -53,7 +61,7 @@ namespace ValheimPictureFrame.Utils
 
         public string[] LoadTextureNames(string dirPath)
         {
-            var dir = Path.Combine(BepInEx.Paths.PluginPath, ImageBasePath, dirPath);
+            var dir = Path.Combine(ImageBasePath, dirPath);
             string[] textureNames;
             try
             {
@@ -61,9 +69,8 @@ namespace ValheimPictureFrame.Utils
                          .Where(s => s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || s.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
                          .ToArray();
             }
-            catch (DirectoryNotFoundException e)
+            catch (DirectoryNotFoundException)
             {
-                Jotunn.Logger.LogWarning(e);
                 return null;
             }
 
@@ -77,7 +84,7 @@ namespace ValheimPictureFrame.Utils
                 return false;
             }
 
-            var dir = Path.Combine(BepInEx.Paths.PluginPath, ImageBasePath, path);
+            var dir = Path.Combine(ImageBasePath, path);
             return Directory.Exists(dir);
         }
     }

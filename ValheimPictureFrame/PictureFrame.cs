@@ -1,49 +1,16 @@
-﻿using System.Collections;
+﻿using BepInEx;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace ValheimPictureFrame
 {
-    public class PictureFrame : MonoBehaviour
+    public class PictureFrame : PictureFrameBase
     {
-        public float Interval { get; set; } = 5.0f;
-        private string[] _textureNames = new string[0];
-        private int _nextIndex = 0;
-
-        public void StartAnimation(string[] textureNames)
-        {
-            _textureNames = textureNames;
-            _nextIndex = 0;
-            StartCoroutine(nameof(NextPicture));
-        }
-
-        public void StopAnimation()
-        {
-            StopCoroutine(nameof(NextPicture));
-        }
-
-        public void SetTexture(string fileName)
-        {
-            Renderer pictureRenderer = transform.Find("Pivot/New/Picture").gameObject.GetComponent<Renderer>();
-            pictureRenderer.material.mainTexture = ValheimPictureFrame.textureCache.Load(fileName);
-        }
-
-        private IEnumerator NextPicture()
-        {
-            while (true)
-            {
-
-                if (_textureNames == null || _textureNames.Length == 0)
-                {
-                    yield break;
-                }
-
-                yield return new WaitForSeconds(Interval);
-
-                _nextIndex = _nextIndex % _textureNames.Length;
-                SetTexture(_textureNames[_nextIndex]);
-                _nextIndex += 1;
-            }
-        }
-
+        public override Vector3 PivotOffset { get; set; } = new Vector3(0.729f, 0.4473f, 0);
+        public override string Name { get; set; } = "$piece_dfirst_pictureframe";
     }
 }
