@@ -8,7 +8,7 @@ using ValheimPictureFrame.Utils;
 
 namespace ValheimPictureFrame
 {
-    [BepInPlugin("dfirst.ValheimPictureFrame", "Valheim Picture Frame", "1.2.0")]
+    [BepInPlugin("dfirst.ValheimPictureFrame", "Valheim Picture Frame", "1.2.1")]
     [BepInDependency(Main.ModGuid)]
     public class ValheimPictureFrame : BaseUnityPlugin
     {

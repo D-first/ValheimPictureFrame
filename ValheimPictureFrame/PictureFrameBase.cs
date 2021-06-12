@@ -135,11 +135,12 @@ namespace ValheimPictureFrame
                     yield break;
                 }
 
-                yield return new WaitForSeconds(_interval);
-
                 _nextIndex = _nextIndex % _textureNames.Length;
                 SetTexture(_textureNames[_nextIndex]);
                 _nextIndex += 1;
+
+                yield return new WaitForSeconds(_interval);
+
             }
         }
 
