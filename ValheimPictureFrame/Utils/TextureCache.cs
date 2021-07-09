@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace ValheimPictureFrame.Utils
 {
@@ -36,7 +38,7 @@ namespace ValheimPictureFrame.Utils
             {
                 return null;
             }
-            
+
             string path = Path.Combine(ImageBasePath, textureName);
 
             if (!File.Exists(path))
@@ -57,6 +59,30 @@ namespace ValheimPictureFrame.Utils
             cache.Add(textureName, texture);
 
             return texture;
+        }
+
+        public IEnumerator FetchFromWeb(string url, Action<Texture> callback)
+        {
+            string textureName = Path.ChangeExtension(url, Path.GetExtension(url).ToLower());
+            if (cache.ContainsKey(textureName))
+            {
+                yield break;
+            }
+
+            using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url))
+            {
+                yield return webRequest.SendWebRequest();
+                if (webRequest.isHttpError || webRequest.isNetworkError)
+                {
+                    Jotunn.Logger.LogError(webRequest.error);
+                }
+                else
+                {
+                    Texture texture = ((DownloadHandlerTexture)webRequest.downloadHandler).texture;
+                    cache.Add(textureName, texture);
+                    callback(texture);
+                }
+            }
         }
 
         public string[] LoadTextureNames(string dirPath)

@@ -1,5 +1,4 @@
-﻿using BepInEx;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -9,17 +8,18 @@ using ValheimPictureFrame.Utils;
 
 namespace ValheimPictureFrame
 {
-    public abstract class PictureFrameBase: MonoBehaviour, Hoverable, Interactable, TextReceiver
+    public abstract class PictureFrameBase : MonoBehaviour, Hoverable, Interactable, TextReceiver
     {
-        private static readonly string _basePath = Path.Combine(Paths.PluginPath, "ValheimPictureFrame/Assets/Images");
+        private static readonly string _basePath = Path.Combine(BepInEx.Paths.PluginPath, "ValheimPictureFrame/Assets/Images");
+        private Renderer _frameRenderer;
 
-        private int _characterLimit = 50;
+        private int _characterLimit = 100;
         private float _interval = 5.0f;
         private TextureCache textureCache;
         private ZNetView _nview;
         private string[] _textureNames = new string[0];
         private int _nextIndex = 0;
-        
+
         public Text TextWidget { get; set; }
 
         public abstract Vector3 PivotOffset { get; set; }
@@ -91,6 +91,10 @@ namespace ValheimPictureFrame
         public void SetTexture(string fileName)
         {
             Renderer pictureRenderer = transform.Find("Pivot/New/Picture").gameObject.GetComponent<Renderer>();
+            if (IsUrl(fileName))
+            {
+                StartCoroutine(textureCache.FetchFromWeb(fileName, texture => pictureRenderer.material.mainTexture = texture));
+            }
             pictureRenderer.material.mainTexture = textureCache.Load(fileName);
         }
 
@@ -113,6 +117,7 @@ namespace ValheimPictureFrame
 
         private void Awake()
         {
+            _frameRenderer = transform.Find("Pivot/New/PictureFrame").gameObject.GetComponent<Renderer>();
             TextWidget = transform.Find("Pivot/Canvas/Text").GetComponent<Text>();
             textureCache = new TextureCache(_basePath);
             _nview = GetComponent<ZNetView>();
@@ -150,13 +155,18 @@ namespace ValheimPictureFrame
             Transform pivotObject = transform.Find("Pivot");
             transform.localScale = Vector3.one;
             pivotObject.transform.localPosition = Vector3.zero;
+            _frameRenderer.enabled = true;
 
             var filePath = text[0].Trim();
+            if (filePath.StartsWith("http"))
+            {
+                filePath = $"{text[0]}:{text[1]}";
+            }
             StopAnimation();
 
-            if (text.Length == 2)
+            if (text.Length == 2 || text.Length == 3)
             {
-                string[] args = text[1].Split(' ');
+                string[] args = text[text.Length - 1].Split(' ');
                 var options = ParseOptions(args);
                 Vector3 pivotOffset = new Vector3(0, 0, 0);
 
@@ -206,8 +216,18 @@ namespace ValheimPictureFrame
                     float interval = Math.Max(float.Parse(options[key]), 0.01f);
                     _interval = interval;
                 }
-            }
 
+                if (options.ContainsKey("frame") || options.ContainsKey("f"))
+                {
+                    string key = options.ContainsKey("frame") ? "frame" : "f";
+                    string frame = options[key];
+
+                    if(frame == "none")
+                    {
+                        _frameRenderer.enabled = false;
+                    }
+                }
+            }
 
             if (textureCache.IsDirectory(filePath))
             {
@@ -220,6 +240,7 @@ namespace ValheimPictureFrame
 
         }
 
+
         private void UpdateText()
         {
             string text = GetText();
@@ -230,6 +251,12 @@ namespace ValheimPictureFrame
 
             TextWidget.text = text;
             UpdatePicture();
+        }
+        private static bool IsUrl(string text)
+        {
+            Uri uriResult;
+            return Uri.TryCreate(text, UriKind.Absolute, out uriResult)
+                       && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
         }
     }
 }
