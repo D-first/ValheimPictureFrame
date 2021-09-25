@@ -60,7 +60,7 @@ namespace ValheimPictureFrame
             return _nview.GetZDO().GetString("text");
         }
 
-        public bool Interact(Humanoid user, bool hold)
+        public bool Interact(Humanoid user, bool hold, bool alt)
         {
             if (hold)
             {

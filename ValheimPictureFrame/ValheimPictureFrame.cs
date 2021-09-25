@@ -8,7 +8,7 @@ using ValheimPictureFrame.Utils;
 
 namespace ValheimPictureFrame
 {
-    [BepInPlugin("dfirst.ValheimPictureFrame", "Valheim Picture Frame", "1.3.0")]
+    [BepInPlugin("dfirst.ValheimPictureFrame", "Valheim Picture Frame", "1.4.0")]
     [BepInDependency(Main.ModGuid)]
     public class ValheimPictureFrame : BaseUnityPlugin
     {
@@ -69,10 +69,7 @@ namespace ValheimPictureFrame
                         break;
                 }
 
-                var piece = new CustomPiece(prefab, config)
-                {
-                    FixReference = true
-                };
+                var piece = new CustomPiece(prefab, false, config);
                 PieceManager.Instance.AddPiece(piece);
             }
 
